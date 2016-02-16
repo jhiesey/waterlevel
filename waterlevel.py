@@ -26,4 +26,4 @@ while errorCount < 5:
 
 outfile.close()
 
-subprocess.call(['rsync', datapath, 'jhiesey@hiesey.com:~/waterlevel/data.csv'])
+subprocess.call(['rsync', datapath, 'jhiesey@hiesey.com:~/www/waterlevel/data.csv'])
