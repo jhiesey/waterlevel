@@ -1,0 +1,12 @@
+extends layout
+
+block body
+  main
+    h1 Current water level:
+    p
+      strong #{waterlevel}cm
+      |  from the top, as of #{meastime}
+    
+    h2 Download full history:
+    p
+      a(href='data.csv') data.csv
