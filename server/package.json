@@ -1,0 +1,27 @@
+{
+  "name": "waterlevel",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/jhiesey/waterlevel.git"
+  },
+  "author": "John Hiesey",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/jhiesey/waterlevel/issues"
+  },
+  "homepage": "https://github.com/jhiesey/waterlevel#readme",
+  "dependencies": {
+    "basic-auth": "^1.0.3",
+    "compression": "^1.6.1",
+    "express": "^4.13.4",
+    "jade": "^1.11.0",
+    "split": "^1.0.0"
+  }
+}
