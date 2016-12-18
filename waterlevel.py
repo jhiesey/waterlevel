@@ -5,7 +5,7 @@ import serial
 import time
 
 ser = serial.Serial(port='/dev/ttyUSB0', timeout=10)
-messageLen = 5
+messageLen = 6
 
 datapath = '/home/pi/waterlevel/data.csv'
 outfile = open(datapath, 'a')
@@ -21,7 +21,8 @@ while errorCount < 5:
 		continue
 
 	timestr = time.strftime('%m/%d/%Y %H:%M')
-	outfile.write('%s,%s\n' % (timestr, result[1:]))
+	level = float(result[1:]) / 10
+	outfile.write('%s,%s\n' % (timestr, level))
 	break
 
 outfile.close()
