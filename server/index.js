@@ -32,11 +32,11 @@ function readLevel(cb) {
     var lines = stream.pipe(split())
     lines.on('data', function (line) {
       var parts = line.split(',')
-      if (parts.length !== 2 || parts[1].length !== 3) {
+      if (parts.length !== 2) {
         return
       }
 
-      res.level = parseInt(parts[1], 10)
+      res.level = parseFloat(parts[1])
       res.time = parts[0]
     })
     lines.on('end', function () {
