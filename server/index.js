@@ -3,7 +3,7 @@ var compress = require('compression')
 var express = require('express')
 var fs = require('fs')
 var http = require('http')
-var jade = require('jade')
+var pug = require('pug')
 var path = require('path')
 var split = require('split')
 var url = require('url')
@@ -53,9 +53,8 @@ var httpServer = http.createServer(app)
 
 // Templating
 app.set('views', path.join(__dirname, 'views'))
-app.set('view engine', 'jade')
+app.set('view engine', 'pug')
 app.set('x-powered-by', false)
-app.engine('jade', jade.renderFile)
 
 app.use(function (req, res, next) {
   function unauthorized() {
