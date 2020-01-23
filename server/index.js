@@ -103,7 +103,7 @@ app.use(function (err, req, res, next) {
   })
 })
 
-httpServer.listen(9200)
+httpServer.listen(9200, '::1')
 
 function error (err) {
   console.error(err.stack || err.message || err)
