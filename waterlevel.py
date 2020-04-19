@@ -1,8 +1,13 @@
 #!/usr/bin/env python3
 
+import argparse
 import subprocess
 import serial
 import time
+
+parser = argparse.ArgumentParser(description='Read water level')
+parser.add_argument('--test', action='store_true')
+args = parser.parse_args()
 
 badLow = 300 # low reading error mm
 badHigh = 5000 # high reading error mm
@@ -17,8 +22,8 @@ outfile = open(datapath, 'a')
 errorCount = 0
 
 while errorCount < 5:
-	ser.write('\0')
-	result = ser.read(messageLen)
+	ser.write(b'\0')
+	result = ser.read(messageLen).decode('ascii')
 
 	if len(result) != messageLen or result[0] != 'R':
 		errorCount += 1
@@ -32,7 +37,11 @@ while errorCount < 5:
 
 	level = rawLevel / 10 - fullOffset
 	timestr = time.strftime('%m/%d/%Y %H:%M')
-	outfile.write('%s,%s\n' % (timestr, level))
+	outLine = f'{timestr},{level:.1f}\n'
+	if args.test:
+		print(outLine)
+	else:
+		outfile.write(outLine)
 	break
 
 outfile.close()
