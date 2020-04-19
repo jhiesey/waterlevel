@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import serial
 import time
@@ -12,7 +12,7 @@ errorCount = 0
 while errorCount < 5:
 	ser.write('\0')
 	result = ser.read(messageLen)
-        print(result)
+		print(result)
 
 	if len(result) != messageLen or result[0] != 'R':
 		sys.exit(1)
