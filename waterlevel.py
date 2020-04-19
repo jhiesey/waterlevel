@@ -25,12 +25,14 @@ while errorCount < 5:
 	result = ser.read(messageLen).decode('ascii')
 
 	if len(result) != messageLen or result[0] != 'R':
+		print('Got bad serial data!')
 		errorCount += 1
 		ser.read(100) # Drain buffer
 		continue
 
 	rawLevel = int(result[1:])
 	if rawLevel == badLow or rawLevel == badHigh:
+		print('Got invalid reading (mm):', rawLevel)
 		errorCount += 1
 		continue
 
