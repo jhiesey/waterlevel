@@ -1,11 +1,12 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import subprocess
 import serial
 import time
 
-badLow = 30
-badHigh = 500
+badLow = 300 # low reading error mm
+badHigh = 5000 # high reading error mm
+
 fullOffset = 49 # this many cm is full
 
 ser = serial.Serial(port='/dev/ttyUSB0', timeout=10)
@@ -24,12 +25,12 @@ while errorCount < 5:
 		ser.read(100) # Drain buffer
 		continue
 
-	rawLevel = float(result[1:]) / 10
+	rawLevel = int(result[1:])
 	if rawLevel == badLow or rawLevel == badHigh:
 		errorCount += 1
 		continue
 
-	level = rawLevel - fullOffset
+	level = rawLevel / 10 - fullOffset
 	timestr = time.strftime('%m/%d/%Y %H:%M')
 	outfile.write('%s,%s\n' % (timestr, level))
 	break
