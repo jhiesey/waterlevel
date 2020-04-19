@@ -18,7 +18,6 @@ ser = serial.Serial(port='/dev/ttyUSB0', timeout=10)
 messageLen = 6
 
 datapath = '/home/pi/waterlevel/data.csv'
-outfile = open(datapath, 'a')
 errorCount = 0
 
 while errorCount < 5:
@@ -41,9 +40,9 @@ while errorCount < 5:
 	if args.test:
 		print(outLine)
 	else:
+		outfile = open(datapath, 'a')
 		outfile.write(outLine)
+		outfile.close()
+
+		subprocess.call(['rsync', datapath, 'tunnel@hiesey.com:~/waterlevel.csv'])
 	break
-
-outfile.close()
-
-subprocess.call(['rsync', datapath, 'tunnel@hiesey.com:~/waterlevel.csv'])
