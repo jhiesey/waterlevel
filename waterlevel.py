@@ -20,7 +20,7 @@ messageLen = 6
 datapath = '/home/pi/waterlevel/data.csv'
 errorCount = 0
 
-while errorCount < 5:
+while errorCount < 10:
 	ser.write(b'\0')
 	result = ser.read(messageLen).decode('ascii')
 
@@ -34,6 +34,7 @@ while errorCount < 5:
 	if rawLevel == badLow or rawLevel == badHigh:
 		print('Got invalid reading (mm):', rawLevel)
 		errorCount += 1
+		time.sleep(5)
 		continue
 
 	level = rawLevel / 10 - fullOffset
