@@ -16,14 +16,14 @@ args = parser.parse_args()
 """
 Non-default radio settings
 
-House (house_modem.pro):
+House (house_modem.xpro):
 ID: 3ABC
 SH: 13A200
 SL: 40661DAC
 DD: 40000
 AP: 2
 
-Tank (tank_modem.pro):
+Tank (tank_modem.xpro):
 ID: 3ABC
 SH: 13A200
 SL: 408950ED
