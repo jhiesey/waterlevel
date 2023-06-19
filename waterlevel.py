@@ -115,6 +115,10 @@ def get_response(ser, expected_frame_id):
 		if frame_type != 0x97 or frame_id != expected_frame_id:
 			continue
 
+		# Check for error
+		if status == 0x4:
+			raise Exception('Failed to get response from tank radio')
+
 		data_len = packet_len - 15
 
 		# Sanity check
