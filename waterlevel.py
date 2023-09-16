@@ -41,7 +41,7 @@ SLOPE_CM_PER_COUNT = SLOPE_PSI_PER_COUNT * 70.307
 TANK_FULL_HEIGHT_CM = 160
 
 def escape_byte(match):
-	return b'\x7d' + (match.group(0)[0] ^ 0x20).to_bytes()
+	return b'\x7d' + (match.group(0)[0] ^ 0x20).to_bytes(1, 'big')
 
 def send_request(ser, frame_id):
 	frame_data = struct.pack('!BB8sHB2s', 0x17, frame_id, REMOTE_ADDR, 0xFFFE, 0, b'IS')
@@ -52,7 +52,7 @@ def send_request(ser, frame_id):
 		if checksum < 0:
 			checksum += 0x100
 
-	framed_data = len(frame_data).to_bytes(2) + frame_data + checksum.to_bytes()
+	framed_data = len(frame_data).to_bytes(2, 'big') + frame_data + checksum.to_bytes(1, 'big')
 
 	packet_data = b'\x7e' + re.sub(b'[\x7e\x7d]', escape_byte, framed_data)
 	if args.test:
@@ -78,7 +78,7 @@ def read_escaped_bytes(ser, desired_length):
 				print('RECEIVE:', b2.hex())
 			if b2 == b'':
 				raise Exception('Short read')
-			out += (b2[0] ^ 0x20).to_bytes()
+			out += (b2[0] ^ 0x20).to_bytes(1, 'big')
 		else:
 			out += b
 
