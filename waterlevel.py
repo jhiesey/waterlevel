@@ -54,7 +54,7 @@ def send_request(ser, frame_id):
 
 	framed_data = len(frame_data).to_bytes(2, 'big') + frame_data + checksum.to_bytes(1, 'big')
 
-	packet_data = b'\x7e' + re.sub(b'[\x7e\x7d]', escape_byte, framed_data)
+	packet_data = b'\x7e' + re.sub(b'[\x7e\x7d\x11\x13]', escape_byte, framed_data)
 	if args.test:
 		print('SEND:', packet_data.hex())
 	ser.write(packet_data)
