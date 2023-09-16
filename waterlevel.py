@@ -36,7 +36,7 @@ PR: 7FFF
 DATA_PATH = '/home/pi/waterlevel/data.csv'
 REMOTE_ADDR = bytes.fromhex('0013A200408950ED') # MAC address of tank radio
 ZERO_OFFSET = 1024 / 10.0
-SLOPE_PSI_PER_COUNT = 5.9 / 1024
+SLOPE_PSI_PER_COUNT = 5.9 / 1024 # Theoretical: 6.25 / 1024
 SLOPE_CM_PER_COUNT = SLOPE_PSI_PER_COUNT * 70.307
 TANK_FULL_HEIGHT_CM = 160
 
@@ -107,7 +107,6 @@ def get_response(ser, expected_frame_id):
 				checksum -= 0x100
 
 		if checksum != 0xFF:
-			print(checksum)
 			raise Exception('Bad checksum')
 
 		[frame_type, frame_id, addr, reserved, command, status] = struct.unpack_from('!BB8sH2sB', frame_data, 0)
