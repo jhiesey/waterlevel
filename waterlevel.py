@@ -36,9 +36,9 @@ PR: 7FFF
 DATA_PATH = '/home/pi/waterlevel/data.csv'
 REMOTE_ADDR = bytes.fromhex('0013A200408950ED') # MAC address of tank radio
 ZERO_OFFSET = 1024 / 10.0
-SLOPE_PSI_PER_COUNT = 6.6 / 1024 # Theoretical: 6.25 / 1024
+SLOPE_PSI_PER_COUNT = 6.5 / 1024 # Theoretical: 6.25 / 1024
 SLOPE_CM_PER_COUNT = SLOPE_PSI_PER_COUNT * 70.307
-TANK_FULL_HEIGHT_CM = 173 # Theoretical: about 170 (plus zero pressure offset)
+TANK_FULL_HEIGHT_CM = 173.0 # Theoretical: about 170 (plus zero pressure offset)
 
 def escape_byte(match):
 	return b'\x7d' + (match.group(0)[0] ^ 0x20).to_bytes(1, 'big')
