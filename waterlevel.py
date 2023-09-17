@@ -39,6 +39,7 @@ ZERO_OFFSET = 1024 / 10.0
 SLOPE_PSI_PER_COUNT = 6.5 / 1024 # Theoretical: 6.25 / 1024
 SLOPE_CM_PER_COUNT = SLOPE_PSI_PER_COUNT * 70.307
 TANK_FULL_HEIGHT_CM = 173.0 # Theoretical: about 170 (plus zero pressure offset)
+NUM_READINGS_AVERAGE = 10
 
 def escape_byte(match):
 	return b'\x7d' + (match.group(0)[0] ^ 0x20).to_bytes(1, 'big')
@@ -148,13 +149,13 @@ def get_reading():
 def main():
 	level = 0
 	try:
-		for i in range(5):
+		for i in range(NUM_READINGS_AVERAGE):
 			level += get_reading()
 	except Exception as ex:
 		print('Failed to get reading!', ex)
 		sys.exit()
 
-	level = level / 5
+	level = level / NUM_READINGS_AVERAGE
 	timestr = time.strftime('%m/%d/%Y %H:%M')
 	outLine = f'{timestr},{level:.1f}\n'
 	if args.test:
