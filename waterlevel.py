@@ -36,7 +36,7 @@ PR: 7FFF
 DATA_PATH = '/home/pi/waterlevel/data.csv'
 REMOTE_ADDR = bytes.fromhex('0013A200408950ED') # MAC address of tank radio
 ZERO_OFFSET = 1024 / 10.0
-SLOPE_PSI_PER_COUNT = 6.7 / 1024 # Theoretical: 6.25 / 1024
+SLOPE_PSI_PER_COUNT = 6.6 / 1024 # Theoretical: 6.25 / 1024
 SLOPE_CM_PER_COUNT = SLOPE_PSI_PER_COUNT * 70.307
 TANK_FULL_HEIGHT_CM = 173 # Theoretical: about 170 (plus zero pressure offset)
 
@@ -146,13 +146,15 @@ def get_reading():
 	return get_response(ser, frame_id)
 
 def main():
-	level = None
+	level = 0
 	try:
-		level = get_reading()
+		for i in range(5):
+			level += get_reading()
 	except Exception as ex:
 		print('Failed to get reading!', ex)
 		sys.exit()
 
+	level = level / 5
 	timestr = time.strftime('%m/%d/%Y %H:%M')
 	outLine = f'{timestr},{level:.1f}\n'
 	if args.test:
