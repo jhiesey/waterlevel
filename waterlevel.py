@@ -35,11 +35,17 @@ PR: 7FFF
 
 DATA_PATH = '/home/pi/waterlevel/data.csv'
 REMOTE_ADDR = bytes.fromhex('0013A200408950ED') # MAC address of tank radio
-ZERO_OFFSET = 1024 / 10.0
-SLOPE_PSI_PER_COUNT = 6.5 / 1024 # Theoretical: 6.25 / 1024
-SLOPE_CM_PER_COUNT = SLOPE_PSI_PER_COUNT * 70.307
-TANK_FULL_HEIGHT_CM = 173.0 # Theoretical: about 170 (plus zero pressure offset)
-NUM_READINGS_AVERAGE = 10
+
+# ADC reading to PSI conversion
+ZERO_PRESSURE_COUNTS = 202.3
+MAX_PRESSURE_COUNTS = 1011.6
+MAX_PRESSURE_PSI = 5
+
+# PSI to level conversion
+TANK_FULL_HEIGHT_CM = 170
+HEIGHT_CM_PER_PSI = 70.307
+
+NUM_READINGS_AVERAGE = 1
 
 def escape_byte(match):
 	return b'\x7d' + (match.group(0)[0] ^ 0x20).to_bytes(1, 'big')
@@ -131,7 +137,12 @@ def get_response(ser, expected_frame_id):
 		if sample_sets != 1 or digital_mask != 0 or analog_mask != 2:
 			raise Exception('Unexpected set of sampled channels')
 
-		return TANK_FULL_HEIGHT_CM - (sample - ZERO_OFFSET) * SLOPE_CM_PER_COUNT
+		psi = (sample - ZERO_PRESSURE_COUNTS) / (MAX_PRESSURE_COUNTS - ZERO_PRESSURE_COUNTS) * MAX_PRESSURE_PSI
+
+		if args.test:
+			print('Pressure in PSI', psi)
+
+		return TANK_FULL_HEIGHT_CM - HEIGHT_CM_PER_PSI * psi
 
 next_frame_id = 1
 
