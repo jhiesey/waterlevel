@@ -1,6 +1,11 @@
 const { Chart, registerables } = require('chart.js')
 require('chartjs-adapter-dayjs-4')
 const dayjs = require('dayjs')
+const utc = require('dayjs/plugin/utc')
+const timezone = require('dayjs/plugin/timezone')
+dayjs.extend(utc);
+dayjs.extend(timezone);
+dayjs.tz.setDefault('America/Los_Angeles');
 
 Chart.register(...registerables)
 
