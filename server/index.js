@@ -6,6 +6,14 @@ const path = require('path')
 const fsReverse = require('fs-reverse')
 const url = require('url')
 
+const dayjs = require('dayjs')
+const utc = require('dayjs/plugin/utc')
+const timezone = require('dayjs/plugin/timezone')
+const customParseFormat = require('dayjs/plugin/customParseFormat')
+dayjs.extend(utc)
+dayjs.extend(timezone)
+dayjs.extend(customParseFormat)
+
 const secret = require('../secret')
 
 const DATA_PATH = '../static/data.csv'
@@ -26,7 +34,7 @@ function readRecentLevels(cb) {
       return
     }
 
-    const date = new Date(parts[0])
+    const date = dayjs.tz(parts[0], 'MM/DD/YYYY HH:mm', 'America/Los_Angeles')
     const level = parseFloat(parts[1])
 
     if (latestDate === null) {
@@ -34,13 +42,13 @@ function readRecentLevels(cb) {
       latestLevel = level
     }
 
-    if (latestDate && new Date(parts[0]) < latestDate.getTime() - HISTORY_LEN_MS) {
+    if (latestDate && date.valueOf() < latestDate.valueOf() - HISTORY_LEN_MS) {
       cb(null, latestDate, latestLevel, points)
       reverseLines.destroy()
     }
 
     points.unshift({
-      x: date.getTime(),
+      x: date.valueOf(),
       y: level,
     })
   })
