@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "browserify client.js -o ../static/build/bundle.js",
     "start": "node index.js"
   },
   "repository": {
@@ -19,9 +19,12 @@
   "homepage": "https://github.com/jhiesey/waterlevel#readme",
   "dependencies": {
     "basic-auth": "^2.0.1",
-    "compression": "^1.7.4",
-    "express": "^4.17.1",
-    "pug": "^3.0.2",
-    "split": "^1.0.1"
+    "browserify": "^17.0.0",
+    "chart.js": "^4.4.0",
+    "chartjs-adapter-dayjs-4": "^1.0.4",
+    "dayjs": "^1.11.10",
+    "express": "^4.18.2",
+    "fs-reverse": "^0.0.3",
+    "pug": "^3.0.2"
   }
 }

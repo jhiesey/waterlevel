@@ -1,55 +1,56 @@
-var basicAuth = require('basic-auth')
-var compress = require('compression')
-var express = require('express')
-var fs = require('fs')
-var http = require('http')
-var pug = require('pug')
-var path = require('path')
-var split = require('split')
-var url = require('url')
+const basicAuth = require('basic-auth')
+const express = require('express')
+const http = require('http')
+const pug = require('pug')
+const path = require('path')
+const fsReverse = require('fs-reverse')
+const url = require('url')
 
-var secret = require('../secret')
+const secret = require('../secret')
 
-var DATA_PATH = '../static/data.csv'
-var TAIL_LENGTH = 100
+const DATA_PATH = '../static/data.csv'
+const HISTORY_LEN_MS = 24 * 3600 * 1000 // 1 day
 
-function readLevel(cb) {
-  fs.stat(DATA_PATH, function (err, stats) {
-    if (err) {
-      return cb(err)
+function readRecentLevels(cb) {
+  let latestDate = null
+  let latestLevel = null
+  const points = []
+  const reverseLines = fsReverse(DATA_PATH)
+  reverseLines.on('error', (err) => {
+    cb(err)
+  })
+
+  reverseLines.on('data', (line) => {
+    const parts = line.split(',')
+    if (parts.length !== 2) {
+      return
     }
 
-    var readPos = Math.max(stats.size - TAIL_LENGTH, 0)
-    var stream = fs.createReadStream(DATA_PATH, {
-      start: readPos
-    })
+    const date = new Date(parts[0])
+    const level = parseFloat(parts[1])
 
-    var res = {
-      level: null,
-      time: null
+    if (latestDate === null) {
+      latestDate = date
+      latestLevel = level
     }
 
-    var lines = stream.pipe(split())
-    lines.on('data', function (line) {
-      var parts = line.split(',')
-      if (parts.length !== 2) {
-        return
-      }
+    if (latestDate && new Date(parts[0]) < latestDate.getTime() - HISTORY_LEN_MS) {
+      cb(null, latestDate, latestLevel, points)
+      reverseLines.destroy()
+    }
 
-      res.level = parseFloat(parts[1])
-      res.time = parts[0]
+    points.unshift({
+      x: date.getTime(),
+      y: level,
     })
-    lines.on('end', function () {
-      cb(null, res)
-    })
-    lines.on('error', function (err) {
-      cb(err)
-    })
+  })
+  reverseLines.on('end', () => {
+    cb(null, latestDate, latestLevel, points)
   })
 }
 
-var app = express()
-var httpServer = http.createServer(app)
+const app = express()
+const httpServer = http.createServer(app)
 
 // Templating
 app.set('views', path.join(__dirname, 'views'))
@@ -61,7 +62,7 @@ app.use(function (req, res, next) {
     res.set('WWW-Authenticate', 'Basic realm=Authorization Required')
     return res.sendStatus(401)
   }
-  var user = basicAuth(req)
+  const user = basicAuth(req)
   // username is ignored
   if (!user || user.pass !== secret.password) {
     return unauthorized()
@@ -73,15 +74,16 @@ app.use(function (req, res, next) {
 app.use(express.static(path.join(__dirname, '../static')))
 
 app.get('/', function (req, res, next) {
-  readLevel(function (err, level) {
+  readRecentLevels(function (err, latestDate, latestLevel, levels) {
     if (err) {
       return next(err)
     }
 
     res.render('index', {
       title: 'Water Level',
-      waterlevel: level.level,
-      meastime: level.time
+      waterlevel: latestLevel,
+      meastime: latestDate?.toLocaleString() ?? null,
+      historyData: JSON.stringify(levels)
     })
   })
 })

@@ -2,11 +2,22 @@ extends layout
 
 block body
   main
-    h1 Current water level:
+    h1 Current water level
     p
       strong #{waterlevel} cm
-      |  from the top at #{meastime}; recalibrated so 0 cm is full
-    
-    h2 Download full history:
+      |  from the top at #{meastime}
+
+    h2 Last day history
+    div(id='history' style='position:relative; width:80vw; height: 50vh;')
+      canvas(id='history-chart')
+
+    h2 Download full history
     p
       a(href='data.csv') data.csv
+
+  script(src='build/bundle.js')
+  script(type='text/javascript').
+      const historyData = !{historyData}
+      const historyChartCanvas = document.getElementById('history-chart')
+
+      renderHistoryChart(historyChartCanvas, historyData)
