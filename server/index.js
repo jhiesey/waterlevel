@@ -10,9 +10,11 @@ const dayjs = require('dayjs')
 const utc = require('dayjs/plugin/utc')
 const timezone = require('dayjs/plugin/timezone')
 const customParseFormat = require('dayjs/plugin/customParseFormat')
+const localizedFormat = require('dayjs/plugin/localizedFormat')
 dayjs.extend(utc)
 dayjs.extend(timezone)
 dayjs.extend(customParseFormat)
+dayjs.extend(localizedFormat)
 
 const secret = require('../secret')
 
@@ -90,7 +92,7 @@ app.get('/', function (req, res, next) {
     res.render('index', {
       title: 'Water Level',
       waterlevel: latestLevel,
-      meastime: latestDate?.toLocaleString() ?? null,
+      meastime: latestDate?.format('L LT') ?? null,
       historyData: JSON.stringify(levels)
     })
   })
