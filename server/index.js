@@ -19,9 +19,8 @@ dayjs.extend(localizedFormat)
 const secret = require('../secret')
 
 const DATA_PATH = '../static/data.csv'
-const HISTORY_LEN_MS = 24 * 3600 * 1000 // 1 day
 
-function readRecentLevels(cb) {
+function readRecentLevels(historyLenSecs, cb) {
   let latestDate = null
   let latestLevel = null
   const points = []
@@ -44,9 +43,9 @@ function readRecentLevels(cb) {
       latestLevel = level
     }
 
-    if (latestDate && date.valueOf() < latestDate.valueOf() - HISTORY_LEN_MS) {
-      cb(null, latestDate, latestLevel, points)
+    if (latestDate && date.valueOf() < latestDate.valueOf() - historyLenSecs * 1000) {
       reverseLines.destroy()
+      return
     }
 
     points.unshift({
@@ -67,7 +66,7 @@ app.set('views', path.join(__dirname, 'views'))
 app.set('view engine', 'pug')
 app.set('x-powered-by', false)
 
-app.use(function (req, res, next) {
+app.use((req, res, next) => {
   function unauthorized() {
     res.set('WWW-Authenticate', 'Basic realm=Authorization Required')
     return res.sendStatus(401)
@@ -83,8 +82,8 @@ app.use(function (req, res, next) {
 
 app.use(express.static(path.join(__dirname, '../static')))
 
-app.get('/', function (req, res, next) {
-  readRecentLevels(function (err, latestDate, latestLevel, levels) {
+app.get('/', (req, res, next) => {
+  readRecentLevels(0, (err, latestDate, latestLevel, levels) => {
     if (err) {
       return next(err)
     }
@@ -92,13 +91,22 @@ app.get('/', function (req, res, next) {
     res.render('index', {
       title: 'Water Level',
       waterlevel: latestLevel,
-      meastime: latestDate?.format('L LT') ?? null,
-      historyData: JSON.stringify(levels)
+      meastime: latestDate?.format('L LT') ?? null
     })
   })
 })
 
-app.get('*', function (req, res) {
+app.get('/history/:seconds', (req, res, next) => {
+  const seconds = Number(req.params.seconds)
+  readRecentLevels(seconds, (err, latestDate, latestLevel, levels) => {
+    if (err) {
+      return next(err)
+    }
+    res.json(levels)
+  })
+})
+
+app.get('*', (req, res) => {
   res.status(404).render('error', {
     title: '404 Page Not Found - water.hiesey.com',
     message: '404 Not Found'
@@ -106,7 +114,7 @@ app.get('*', function (req, res) {
 })
 
 // error handling middleware
-app.use(function (err, req, res, next) {
+app.use((err, req, res, next) => {
   error(err)
   res.status(500).render('error', {
     title: '500 Server Error - water.hiesey.com',

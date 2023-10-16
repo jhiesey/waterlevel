@@ -3,8 +3,18 @@ require('chartjs-adapter-dayjs-4')
 
 Chart.register(...registerables)
 
-global.renderHistoryChart = function (canvas, data) {
-  const historyChart = new Chart(canvas, {
+const historyChartCanvas = document.getElementById('history-chart')
+const historyDurationSelect = document.getElementById('duration-select')
+
+let chart = null
+function renderHistoryChart (data) {
+  if (chart) {
+    chart.data.datasets[0].data = data
+    chart.update()
+    return
+  }
+
+  chart = new Chart(historyChartCanvas, {
     type: 'line',
     data: {
       datasets: [{
@@ -16,6 +26,7 @@ global.renderHistoryChart = function (canvas, data) {
     options: {
       parsing:false,
       responsive: true,
+      animation: false,
       maintainAspectRatio: false,
       title: {
         display: true,
@@ -27,6 +38,16 @@ global.renderHistoryChart = function (canvas, data) {
           title: {
             display: true,
             text: 'measurement time'
+          },
+          time: {
+            unit: 'hour',
+            displayFormats: {
+              hour: 'MMM D h:mm a'
+            }
+          },
+          ticks: {
+            minRotation: 90,
+            maxRotation: 90
           }
         },
         y: {
@@ -47,3 +68,33 @@ global.renderHistoryChart = function (canvas, data) {
     }
   })
 }
+
+let loading = false
+async function loadHistory () {
+  if (loading) {
+    return
+  }
+  loading = true
+  try {
+    const duration = historyDurationSelect.value
+
+    const response = await fetch(`/history/${duration}`)
+    if (!response.ok) {
+      throw new Error(`Request failed; status ${response.status} ${response.statusText}`)
+    }
+
+    const data = await response.json()
+    renderHistoryChart(data)
+  } finally {
+    loading = false
+  }
+}
+
+function wrappedLoadHistory () {
+  loadHistory().catch(err => {
+    console.error('Failed to load:', err)
+  })
+}
+
+wrappedLoadHistory()
+historyDurationSelect.addEventListener('change', wrappedLoadHistory)

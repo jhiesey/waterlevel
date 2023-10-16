@@ -7,17 +7,20 @@ block body
       strong #{waterlevel} cm
       |  from the top at #{meastime}
 
-    h2 Last day history
+    h2 Recent history
     div(id='history' style='position:relative; width:80vw; height: 50vh;')
       canvas(id='history-chart')
+    div
+      label(for='duration-select') Graph duration:
+    select(id='duration-select')
+      option(value='86400') 1 Day
+      option(value='172800') 2 Days
+      option(value='259200') 3 Days
+      option(value='604800') 1 Week
+      option(value='1209600') 2 Weeks
 
     h2 Download full history
     p
       a(href='data.csv') data.csv
 
   script(src='build/bundle.js')
-  script(type='text/javascript').
-      const historyData = !{historyData}
-      const historyChartCanvas = document.getElementById('history-chart')
-
-      renderHistoryChart(historyChartCanvas, historyData)
