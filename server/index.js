@@ -29,6 +29,14 @@ function readRecentLevels(historyLenSecs, cb) {
     cb(err)
   })
 
+  let done = false
+  const onDone = () => {
+    if (!done) {
+      done = true
+      cb(null, latestDate, latestLevel, points)
+    }
+  }
+
   reverseLines.on('data', (line) => {
     const parts = line.split(',')
     if (parts.length !== 2) {
@@ -45,6 +53,7 @@ function readRecentLevels(historyLenSecs, cb) {
 
     if (latestDate && date.valueOf() < latestDate.valueOf() - historyLenSecs * 1000) {
       reverseLines.destroy()
+      onDone()
       return
     }
 
@@ -53,9 +62,7 @@ function readRecentLevels(historyLenSecs, cb) {
       y: level,
     })
   })
-  reverseLines.on('end', () => {
-    cb(null, latestDate, latestLevel, points)
-  })
+  reverseLines.on('end', onDone)
 }
 
 const app = express()
