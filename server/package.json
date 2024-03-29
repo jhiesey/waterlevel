@@ -23,7 +23,7 @@
     "chart.js": "^4.4.0",
     "chartjs-adapter-dayjs-4": "^1.0.4",
     "dayjs": "^1.11.10",
-    "express": "^4.18.2",
+    "express": "^4.19.2",
     "fs-reverse": "^0.0.3",
     "pug": "^3.0.2"
   }
