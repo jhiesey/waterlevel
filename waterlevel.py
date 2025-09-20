@@ -33,7 +33,7 @@ D1: 2
 PR: 7FFF
 """
 
-DATA_PATH = '/home/pi/waterlevel/data.csv'
+DATA_PATH = '/home/jhiesey/waterlevel/data.csv'
 REMOTE_ADDR = bytes.fromhex('0013A200408950ED') # MAC address of tank radio
 
 # ADC reading to PSI conversion
